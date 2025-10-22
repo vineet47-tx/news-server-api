@@ -1,0 +1,37 @@
+<!--File path: views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>EJS Example</title>
+    <style>
+        h1 {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Include Header File -->
+    <%- include('header') %>
+
+        <!-- Conditional Example -->
+        <% if (isAdmin) { %>
+            <p>Welcome, Admin!</p>
+            <% } else { %>
+                <p>Welcome, User!</p>
+                <% } %>
+
+                    <!-- Loop Example -->
+                    <ul>
+                        <% items.forEach(function(item) { %>
+                            <li>
+                                <%= item %>
+                            </li>
+                            <% }); %>
+                    </ul>
+</body>
+
+</html>
