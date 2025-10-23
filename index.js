@@ -25,11 +25,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.get('/', (req, res) => {
     //Sending this data from Server
     const data = {
-        name: 'GeeksForGeeks!',
-        items: ['Apple', 'Banana', 'Orange',
-            'Grapes', 'Mango']
+        name: 'ABC News',
+        items: ['How are India-Taliban relations changing? | Explained', 
+            'What are the new PF withdrawal guidelines? | Explained', 
+            'What is the latest offering by OpenAI which has caused much outrage? | Explained',
+            'How are India-Taliban relations changing? | Explained']
     };
-
     // Render the EJS template named 'index' and pass the data
     res.render('index', data);
 });
