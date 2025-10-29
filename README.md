@@ -32,3 +32,36 @@ Result: The old container instance is automatically removed from your system. Yo
 docker stop my-express-container
 
 docker rm my-express-container
+
+
+
+901741122726.dkr.ecr.ap-south-1.amazonaws.com/news-server-api
+//*
+
+after aws config in local (FULL ADMIN ACCESS IF YOU ARE NEW TO IAM)
+
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 901741122726.dkr.ecr.ap-south-1.amazonaws.com
+
+
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 901741122726.dkr.ecr.ap-south-1.amazonaws.com
+
+
+3. Build the Docker Image
+
+In your project folder (where Dockerfile and index.js exist):
+
+docker build -t news-server-api .
+
+
+4. Tag the Image for ECR
+docker tag news-server-api:latest 901741122726.dkr.ecr.ap-south-1.amazonaws.com/news-server-api:latest
+
+
+5. Push the Image to ECR
+docker push 901741122726.dkr.ecr.ap-south-1.amazonaws.com/news-server-api:latest
+
+
+6. Verify the Image in ECR
+aws ecr list-images --repository-name news-server-api
+
+//*

@@ -11,6 +11,8 @@
         h1 {
             color: green;
         }
+        .sidebar-card { max-height: 220px; overflow: auto; }
+        .news-title { font-size: 0.95rem; font-weight: 600; }
     </style>
 </head>
 
@@ -30,47 +32,112 @@
                         <p class="card-text">Main story content goes here...</p>
                     </div>
                 </div>
+
+                <!-- Image gallery pulled from S3 -->
+                <h4 class="mt-4">Image Gallery</h4>
+                <div class="row">
+                    <% if (items && items.length) { %>
+                        <% items.forEach(function(img) { 
+                            // normalize values: img may be a string or an object.
+                            var imageUrl = (img && img.url && img.url.url) ? img.url.url : (img && img.url) ? img.url : (typeof img === 'string' ? '' : '');
+                            var title = (img && img.title) ? img.title : (img && img.key) ? img.key : (typeof img === 'string' ? img : 'Untitled');
+                        %>
+                            <div class="col-6 col-md-4 col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    <% if (imageUrl) { %>
+                                        <img src="<%= imageUrl %>" class="card-img-top" alt="<%= title %>">
+                                    <% } else { %>
+                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height:150px;">
+                                            <small class="text-muted">No preview</small>
+                                        </div>
+                                    <% } %>
+                                    <div class="card-body p-2">
+                                        <small class="text-muted"><%= title %></small>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="col-12">
+                            <p class="text-muted">No images available.</p>
+                        </div>
+                    <% } %>
+                </div>
             </div>
 
-            <!-- Latest News Sidebar -->
+            <!-- Sidebar -->
             <div class="col-md-4">
-                <h2 class="mb-4">Latest News</h2>
-                <div class="list-group">
-                    <% items.forEach(function(item) { %>
-                        <a style="text-decoration: underline;" href="#" class="list-group-item list-group-item-action">
-                            <%= item %>
-                        </a>
-                    <% }); %>
+                <div class="mb-4">
+                    <h5 class="mb-3">Latest</h5>
+                    <div class="list-group sidebar-card">
+                        <% if (sidebar && sidebar.latest && sidebar.latest.length) { %>
+                            <% sidebar.latest.forEach(function(item) { %>
+                                <a href="#" class="list-group-item list-group-item-action small"><%= item %></a>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="p-2 text-muted small">No latest items.</div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="mb-3">Categories</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        <% if (sidebar && sidebar.categories && sidebar.categories.length) { %>
+                            <% sidebar.categories.forEach(function(cat) { %>
+                                <a href="/category/<%= cat.slug %>" class="btn btn-outline-secondary btn-sm"><%= cat.name %></a>
+                            <% }); %>
+                        <% } else { %>
+                            <small class="text-muted">No categories.</small>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Subscribe</h6>
+                        <p class="card-text small text-muted">Get the latest headlines delivered to your inbox.</p>
+                        <form>
+                            <div class="mb-2">
+                                <input type="email" class="form-control form-control-sm" placeholder="Email address">
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm">Subscribe</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Categories Section -->
+        <!-- Additional sections (optional) -->
         <div class="row mt-4">
             <div class="col-md-12">
-                <h2 class="mb-4">News Categories</h2>
+                <h5>Top Stories</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
+                    <!-- Example cards -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="https://placehold.co/400x200" class="card-img-top" alt="story">
                             <div class="card-body">
-                                <h5 class="card-title">Technology</h5>
-                                <p class="card-text">Latest technology news and updates</p>
+                                <p class="news-title">Analysis: Market movements this week</p>
+                                <p class="small text-muted">By Staff | 2 hrs ago</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="https://placehold.co/400x200" class="card-img-top" alt="story">
                             <div class="card-body">
-                                <h5 class="card-title">Business</h5>
-                                <p class="card-text">Business and finance updates</p>
+                                <p class="news-title">Tech: New device launches</p>
+                                <p class="small text-muted">By Tech Desk | 4 hrs ago</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="https://placehold.co/400x200" class="card-img-top" alt="story">
                             <div class="card-body">
-                                <h5 class="card-title">Sports</h5>
-                                <p class="card-text">Sports news and highlights</p>
+                                <p class="news-title">Sports: Weekly roundup</p>
+                                <p class="small text-muted">By Sports | 6 hrs ago</p>
                             </div>
                         </div>
                     </div>
