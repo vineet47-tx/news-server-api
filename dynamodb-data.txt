@@ -1,0 +1,52 @@
+{
+    "id": { "S": "news-1" },
+    "title": { "S": "How are India-Taliban relations changing? | Explained" },
+    "summary": { "S": "A concise explainer on evolving relations and geopolitics." },
+    "author": { "S": "Foreign Desk" },
+    "publishedAt": { "S": "2025-11-02T08:00:00Z" },
+    "imageKey": { "S": "news1.jpg" },
+    "tags": { "L": [ { "S": "world" }, { "S": "india" } ] }
+  }
+
+
+  {
+    "id": { "S": "news-2" },
+    "title": { "S": "What are the new PF withdrawal guidelines? | Explained" },
+    "summary": { "S": "Key changes to provident fund withdrawals and what it means for employees." },
+    "author": { "S": "Business Desk" },
+    "publishedAt": { "S": "2025-11-01T14:30:00Z" },
+    "imageKey": { "S": "news2.jpg" },
+    "tags": { "L": [ { "S": "business" }, { "S": "policy" } ] }
+  }
+
+  {
+    "id": { "S": "news-3" },
+    "title": { "S": "OpenAI's latest offering: what you should know" },
+    "summary": { "S": "Overview of the new product, features and the public reaction." },
+    "author": { "S": "Tech Desk" },
+    "publishedAt": { "S": "2025-10-30T10:15:00Z" },
+    "imageKey": { "S": "news3.jpg" },
+    "tags": { "L": [ { "S": "technology" }, { "S": "ai" } ] }
+  }
+
+  {
+    "id": { "S": "news-4" },
+    "title": { "S": "Sports roundup: highlights of the week" },
+    "summary": { "S": "Top sporting moments and scores from the last seven days." },
+    "author": { "S": "Sports" },
+    "publishedAt": { "S": "2025-10-29T19:00:00Z" },
+    "imageKey": { "S": "news4.jpg" },
+    "tags": { "L": [ { "S": "sports" } ] }
+  }
+
+
+
+{ "id": { "S": "latest-1" }, "type": { "S": "latest" }, "title": { "S": "Elections 2025: what to watch" } }
+  { "id": { "S": "latest-2" }, "type": { "S": "latest" }, "title": { "S": "Market roundup: Stocks to watch" } }
+  { "id": { "S": "latest-3" }, "type": { "S": "latest" }, "title": { "S": "Sports: Highlights of the week" } }
+
+
+  { "id": { "S": "cat-technology" }, "type": { "S": "category" }, "name": { "S": "Technology" }, "slug": { "S": "technology" } }
+  { "id": { "S": "cat-business" }, "type": { "S": "category" }, "name": { "S": "Business" }, "slug": { "S": "business" } }
+  { "id": { "S": "cat-sports" }, "type": { "S": "category" }, "name": { "S": "Sports" }, "slug": { "S": "sports" } }
+  { "id": { "S": "cat-world" }, "type": { "S": "category" }, "name": { "S": "World" }, "slug": { "S": "world" } }

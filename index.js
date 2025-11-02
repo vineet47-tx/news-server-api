@@ -8,6 +8,14 @@ const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+
+// Initialize DynamoDB Document client (uses same region/env chain)
+const ddbClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-south-1' });
+const docClient = DynamoDBDocumentClient.from(ddbClient);
+
+
 // Create an Express application
 const app = express();
 
@@ -23,7 +31,9 @@ Set the views directory to 'views'
  */
 app.set('views', path.join(__dirname, 'views'));
 
-/*
+ // back-tick - `
+
+ /*
  Initialize S3 client.
  It will use DefaultCredentialProvider (ECS task role, env vars, or local profile).
  Optionally set region via AWS_REGION env var or hardcode here.
@@ -42,7 +52,98 @@ async function streamToString(stream) {
     });
 }
 
-const bucket_name = process.env.BUCKET_NAME || 'my-actual-bucker-name';
+function normalizeValue(val) {
+    if (val === null || val === undefined) return val;
+    if (typeof val !== 'object') return val;
+
+    // DynamoDB low-level attribute value shapes
+    if ('S' in val) return val.S;
+    if ('N' in val) return Number(val.N);
+    if ('BOOL' in val) return val.BOOL;
+    if ('L' in val) return (val.L || []).map(normalizeValue);
+    if ('M' in val) {
+        const out = {};
+        for (const k of Object.keys(val.M || {})) out[k] = normalizeValue(val.M[k]);
+        return out;
+    }
+
+    // If already a plain object (DocumentClient), normalize its fields
+    const out = {};
+    for (const k of Object.keys(val)) out[k] = normalizeValue(val[k]);
+    return out;
+}
+
+// new: fetch news items from DynamoDB (expects items with a `title` or `heading` attribute)
+async function fetchNewsFromDDB() {
+    const TableName = process.env.NEWS_TABLE || 'News';
+    try {
+        const cmd = new ScanCommand({ TableName, Limit: 100 });
+        const resp = await docClient.send(cmd);
+        const rawItems = resp.Items || [];
+
+        // normalize low-level AttributeValue shapes or DocumentClient shapes
+        const items = rawItems.map(it => normalizeValue(it));
+
+        // map to a consistent shape the app expects
+        const mapped = items.map(i => ({
+            id: i.id || i.ID || null,
+            title: i.title || i.heading || i.name || '',
+            summary: i.summary || '',
+            author: i.author || '',
+            publishedAt: i.publishedAt || '',
+            imageKey: i.imageKey || i.image || null,
+            tags: Array.isArray(i.tags) ? i.tags : (i.tags ? [i.tags] : [])
+        }));
+
+        return mapped;
+    } catch (err) {
+        console.error('Error fetching news from DynamoDB:', err);
+        throw err;
+    }
+}
+
+
+// new: fetch sidebar data from DynamoDB
+// supports two schemas:
+// 1) each item has type: 'latest' or 'category' with appropriate fields
+// 2) single config item with latest[] and categories[] attributes
+async function fetchSidebarFromDDB() {
+    const TableName = process.env.SIDEBAR_TABLE || 'Sidebar';
+    try {
+        const cmd = new ScanCommand({ TableName, Limit: 100 });
+        const resp = await docClient.send(cmd);
+        const rawItems = resp.Items || [];
+
+        // normalize all items to plain JS objects
+        const items = rawItems.map(it => normalizeValue(it));
+
+        // support single-config item with arrays: { latest: [...], categories: [...] }
+        if (items[0] && (Array.isArray(items[0].latest) || Array.isArray(items[0].categories))) {
+            return {
+                latest: items[0].latest || [],
+                categories: items[0].categories || []
+            };
+        }
+
+        // per-row style: type === 'latest' or type === 'category'
+        const latest = items
+            .filter(i => (i.type === 'latest'))
+            .map(i => i.title || i.name)
+            .filter(Boolean);
+
+        const categories = items
+            .filter(i => (i.type === 'category'))
+            .map(i => ({ name: i.name, slug: i.slug || (i.name || '').toLowerCase().replace(/\s+/g, '-') }))
+            .filter(Boolean);
+
+        return { latest, categories };
+    } catch (err) {
+        console.error('Error fetching sidebar from DynamoDB:', err);
+        throw err;
+    }
+}
+
+const bucket_name = process.env.BUCKET_NAME || 'portal-images-cc-assignment';
 
 /*
  Fetch an object from S3 and return its string content.
@@ -72,12 +173,7 @@ async function fetchImageUrlByKey(key) {
  */
 app.get('/', async (req, res) => {
     // Default news items (kept as fallback)
-    let newsItems = [
-        'How are India-Taliban relations changing? | Explained',
-        'What are the new PF withdrawal guidelines? | Explained',
-        'What is the latest offering by OpenAI which has caused much outrage? | Explained',
-        'How are India-Taliban relations changing? | Explained'
-    ];
+    let newsItems = await fetchNewsFromDDB();
 
     let items = newsItems; // fallback
 
@@ -88,27 +184,15 @@ app.get('/', async (req, res) => {
         'news4.jpg'
     ]
 
-    // Sidebar data (passed to the view)
-    const sidebar = {
-        latest: [
-            'Elections 2025: what to watch',
-            'Market roundup: Stocks to watch',
-            'Sports: Highlights of the week'
-        ],
-        categories: [
-            { name: 'Technology', slug: 'technology' },
-            { name: 'Business', slug: 'business' },
-            { name: 'Sports', slug: 'sports' },
-            { name: 'World', slug: 'world' }
-        ]
-    };
+    sidebar = await fetchSidebarFromDDB();
+    console.log('Fetched sidebar data:', sidebar);
     
     try {
             const fetched = await Promise.all(keys.map(k => fetchImageUrlByKey(k)));
             // store fetched objects in items as { key, url }
             items = newsItems.map((x, i) => {
                 return {
-                    title: x,
+                    title: x.title,
                     url: fetched[i]
                 }
             })

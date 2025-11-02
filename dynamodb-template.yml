@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  CloudFormation template to create DynamoDB tables used by the news-server-api:
+  - News (stores news items)
+  - Sidebar (stores sidebar config or per-item latest/category records)
+
+Parameters:
+  NewsTableName:
+    Type: String
+    Default: News
+    Description: Table name for news items
+  SidebarTableName:
+    Type: String
+    Default: Sidebar
+    Description: Table name for sidebar configuration / items
+
+Resources:
+  NewsDynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref NewsTableName
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: news-server-api
+
+  SidebarDynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref SidebarTableName
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Project
+          Value: news-server-api
+
+Outputs:
+  NewsTableName:
+    Description: Name of the News DynamoDB table
+    Value: !Ref NewsDynamoTable
+
+  NewsTableArn:
+    Description: ARN of the News table
+    Value: !GetAtt NewsDynamoTable.Arn
+
+  SidebarTableName:
+    Description: Name of the Sidebar DynamoDB table
+    Value: !Ref SidebarDynamoTable
+
+  SidebarTableArn:
+    Description: ARN of the Sidebar table
+    Value: !GetAtt SidebarDynamoTable.Arn
