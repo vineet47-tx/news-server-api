@@ -1,52 +1,121 @@
 {
-    "id": { "S": "news-1" },
-    "title": { "S": "How are India-Taliban relations changing? | Explained" },
-    "summary": { "S": "A concise explainer on evolving relations and geopolitics." },
-    "author": { "S": "Foreign Desk" },
-    "publishedAt": { "S": "2025-11-02T08:00:00Z" },
-    "imageKey": { "S": "news1.jpg" },
-    "tags": { "L": [ { "S": "world" }, { "S": "india" } ] }
-  }
-
-
-  {
-    "id": { "S": "news-2" },
-    "title": { "S": "What are the new PF withdrawal guidelines? | Explained" },
-    "summary": { "S": "Key changes to provident fund withdrawals and what it means for employees." },
-    "author": { "S": "Business Desk" },
-    "publishedAt": { "S": "2025-11-01T14:30:00Z" },
-    "imageKey": { "S": "news2.jpg" },
-    "tags": { "L": [ { "S": "business" }, { "S": "policy" } ] }
-  }
-
-  {
-    "id": { "S": "news-3" },
-    "title": { "S": "OpenAI's latest offering: what you should know" },
-    "summary": { "S": "Overview of the new product, features and the public reaction." },
-    "author": { "S": "Tech Desk" },
-    "publishedAt": { "S": "2025-10-30T10:15:00Z" },
-    "imageKey": { "S": "news3.jpg" },
-    "tags": { "L": [ { "S": "technology" }, { "S": "ai" } ] }
-  }
-
-  {
-    "id": { "S": "news-4" },
-    "title": { "S": "Sports roundup: highlights of the week" },
-    "summary": { "S": "Top sporting moments and scores from the last seven days." },
-    "author": { "S": "Sports" },
-    "publishedAt": { "S": "2025-10-29T19:00:00Z" },
-    "imageKey": { "S": "news4.jpg" },
-    "tags": { "L": [ { "S": "sports" } ] }
-  }
-
-
-
+  "id": { "S": "news-1" },
+  "title": { "S": "How are India-Taliban relations changing? | Explained" },
+  "summary": { "S": "A concise explainer on evolving relations and geopolitics." },
+  "author": { "S": "Foreign Desk" },
+  "publishedAt": { "S": "2025-11-02T08:00:00Z" },
+  "imageKey": { "S": "news1.jpg" },
+  "tags": { "L": [ { "S": "world" }, { "S": "india" } ] }
+}
+{
+  "id": { "S": "news-2" },
+  "title": { "S": "What are the new PF withdrawal guidelines? | Explained" },
+  "summary": { "S": "Key changes to provident fund withdrawals and what it means for employees." },
+  "author": { "S": "Business Desk" },
+  "publishedAt": { "S": "2025-11-01T14:30:00Z" },
+  "imageKey": { "S": "news2.jpg" },
+  "tags": { "L": [ { "S": "business" }, { "S": "policy" } ] }
+}
+{
+  "id": { "S": "news-3" },
+  "title": { "S": "OpenAI's latest offering: what you should know" },
+  "summary": { "S": "Overview of the new product, features and the public reaction." },
+  "author": { "S": "Tech Desk" },
+  "publishedAt": { "S": "2025-10-30T10:15:00Z" },
+  "imageKey": { "S": "news3.jpg" },
+  "tags": { "L": [ { "S": "technology" }, { "S": "ai" } ] }
+}
+{
+  "id": { "S": "news-4" },
+  "title": { "S": "Sports roundup: highlights of the week" },
+  "summary": { "S": "Top sporting moments and scores from the last seven days." },
+  "author": { "S": "Sports" },
+  "publishedAt": { "S": "2025-10-29T19:00:00Z" },
+  "imageKey": { "S": "news4.jpg" },
+  "tags": { "L": [ { "S": "sports" } ] }
+}
+{
+  "id": { "S": "news-5" },
+  "title": { "S": "Climate Change Summit: Key Agreements Reached" },
+  "summary": { "S": "World leaders commit to ambitious carbon reduction targets at the global climate conference." },
+  "author": { "S": "Environment Desk" },
+  "publishedAt": { "S": "2025-11-03T12:00:00Z" },
+  "imageKey": { "S": "news5.jpg" },
+  "tags": { "L": [ { "S": "world" }, { "S": "environment" }, { "S": "climate" } ] }
+}
+{
+  "id": { "S": "news-6" },
+  "title": { "S": "Electric Vehicle Market Booms in India" },
+  "summary": { "S": "Sales of electric vehicles surge by 300% as government incentives drive adoption." },
+  "author": { "S": "Auto Desk" },
+  "publishedAt": { "S": "2025-11-02T16:45:00Z" },
+  "imageKey": { "S": "news6.jpg" },
+  "tags": { "L": [ { "S": "business" }, { "S": "technology" }, { "S": "automotive" } ] }
+}
+{
+  "id": { "S": "news-7" },
+  "title": { "S": "Cryptocurrency Regulations: What to Expect" },
+  "summary": { "S": "Government announces comprehensive framework for digital currency regulation." },
+  "author": { "S": "Finance Desk" },
+  "publishedAt": { "S": "2025-11-01T09:20:00Z" },
+  "imageKey": { "S": "news7.jpg" },
+  "tags": { "L": [ { "S": "business" }, { "S": "technology" }, { "S": "finance" } ] }
+}
+{
+  "id": { "S": "news-8" },
+  "title": { "S": "Space Tourism: First Commercial Flight Success" },
+  "summary": { "S": "Private space company achieves milestone with successful tourist mission to orbit." },
+  "author": { "S": "Science Desk" },
+  "publishedAt": { "S": "2025-10-31T11:30:00Z" },
+  "imageKey": { "S": "news8.jpg" },
+  "tags": { "L": [ { "S": "technology" }, { "S": "science" }, { "S": "space" } ] }
+}
+{
+  "id": { "S": "news-9" },
+  "title": { "S": "Olympic Games 2028: Host City Announced" },
+  "summary": { "S": "International Olympic Committee selects Los Angeles as host for 2028 Summer Games." },
+  "author": { "S": "Sports Desk" },
+  "publishedAt": { "S": "2025-10-30T14:15:00Z" },
+  "imageKey": { "S": "news9.jpg" },
+  "tags": { "L": [ { "S": "sports" }, { "S": "olympics" }, { "S": "international" } ] }
+}
+{
+  "id": { "S": "news-10" },
+  "title": { "S": "AI Revolution in Healthcare: New Breakthroughs" },
+  "summary": { "S": "Artificial intelligence transforms medical diagnosis and treatment planning." },
+  "author": { "S": "Health Desk" },
+  "publishedAt": { "S": "2025-10-29T08:45:00Z" },
+  "imageKey": { "S": "news10.jpg" },
+  "tags": { "L": [ { "S": "technology" }, { "S": "healthcare" }, { "S": "ai" } ] }
+}
+{
+  "id": { "S": "news-11" },
+  "title": { "S": "Renewable Energy Targets: India Leads Globally" },
+  "summary": { "S": "Country achieves 50% renewable energy capacity ahead of schedule." },
+  "author": { "S": "Energy Desk" },
+  "publishedAt": { "S": "2025-11-04T10:00:00Z" },
+  "imageKey": { "S": "news11.jpg" },
+  "tags": { "L": [ { "S": "business" }, { "S": "environment" }, { "S": "energy" } ] }
+}
+{
+  "id": { "S": "news-12" },
+  "title": { "S": "Quantum Computing: Major Breakthrough Announced" },
+  "summary": { "S": "Scientists achieve quantum supremacy milestone with new computing architecture." },
+  "author": { "S": "Tech Desk" },
+  "publishedAt": { "S": "2025-11-03T15:30:00Z" },
+  "imageKey": { "S": "news12.jpg" },
+  "tags": { "L": [ { "S": "technology" }, { "S": "science" }, { "S": "computing" } ] }
+}
 { "id": { "S": "latest-1" }, "type": { "S": "latest" }, "title": { "S": "Elections 2025: what to watch" } }
-  { "id": { "S": "latest-2" }, "type": { "S": "latest" }, "title": { "S": "Market roundup: Stocks to watch" } }
-  { "id": { "S": "latest-3" }, "type": { "S": "latest" }, "title": { "S": "Sports: Highlights of the week" } }
-
-
-  { "id": { "S": "cat-technology" }, "type": { "S": "category" }, "name": { "S": "Technology" }, "slug": { "S": "technology" } }
-  { "id": { "S": "cat-business" }, "type": { "S": "category" }, "name": { "S": "Business" }, "slug": { "S": "business" } }
-  { "id": { "S": "cat-sports" }, "type": { "S": "category" }, "name": { "S": "Sports" }, "slug": { "S": "sports" } }
-  { "id": { "S": "cat-world" }, "type": { "S": "category" }, "name": { "S": "World" }, "slug": { "S": "world" } }
+{ "id": { "S": "latest-2" }, "type": { "S": "latest" }, "title": { "S": "Market roundup: Stocks to watch" } }
+{ "id": { "S": "latest-3" }, "type": { "S": "latest" }, "title": { "S": "Sports: Highlights of the week" } }
+{ "id": { "S": "latest-4" }, "type": { "S": "latest" }, "title": { "S": "Climate summit agreements" } }
+{ "id": { "S": "latest-5" }, "type": { "S": "latest" }, "title": { "S": "EV market surge in India" } }
+{ "id": { "S": "latest-6" }, "type": { "S": "latest" }, "title": { "S": "Crypto regulations announced" } }
+{ "id": { "S": "cat-technology" }, "type": { "S": "category" }, "name": { "S": "Technology" }, "slug": { "S": "technology" } }
+{ "id": { "S": "cat-business" }, "type": { "S": "category" }, "name": { "S": "Business" }, "slug": { "S": "business" } }
+{ "id": { "S": "cat-sports" }, "type": { "S": "category" }, "name": { "S": "Sports" }, "slug": { "S": "sports" } }
+{ "id": { "S": "cat-world" }, "type": { "S": "category" }, "name": { "S": "World" }, "slug": { "S": "world" } }
+{ "id": { "S": "cat-science" }, "type": { "S": "category" }, "name": { "S": "Science" }, "slug": { "S": "science" } }
+{ "id": { "S": "cat-health" }, "type": { "S": "category" }, "name": { "S": "Health" }, "slug": { "S": "health" } }
+{ "id": { "S": "cat-environment" }, "type": { "S": "category" }, "name": { "S": "Environment" }, "slug": { "S": "environment" } }

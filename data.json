@@ -1,0 +1,131 @@
+{
+  "news": [
+    {
+      "id": "news-1",
+      "title": "How are India-Taliban relations changing? | Explained",
+      "summary": "A concise explainer on evolving relations and geopolitics.",
+      "author": "Foreign Desk",
+      "publishedAt": "2025-11-02T08:00:00Z",
+      "imageKey": "news1.jpg",
+      "tags": ["world", "india"]
+    },
+    {
+      "id": "news-2",
+      "title": "What are the new PF withdrawal guidelines? | Explained",
+      "summary": "Key changes to provident fund withdrawals and what it means for employees.",
+      "author": "Business Desk",
+      "publishedAt": "2025-11-01T14:30:00Z",
+      "imageKey": "news2.jpg",
+      "tags": ["business", "policy"]
+    },
+    {
+      "id": "news-3",
+      "title": "OpenAI's latest offering: what you should know",
+      "summary": "Overview of the new product, features and the public reaction.",
+      "author": "Tech Desk",
+      "publishedAt": "2025-10-30T10:15:00Z",
+      "imageKey": "news3.jpg",
+      "tags": ["technology", "ai"]
+    },
+    {
+      "id": "news-4",
+      "title": "Sports roundup: highlights of the week",
+      "summary": "Top sporting moments and scores from the last seven days.",
+      "author": "Sports",
+      "publishedAt": "2025-10-29T19:00:00Z",
+      "imageKey": "news4.jpg",
+      "tags": ["sports"]
+    },
+    {
+      "id": "news-5",
+      "title": "Climate Change Summit: Key Agreements Reached",
+      "summary": "World leaders commit to ambitious carbon reduction targets at the global climate conference.",
+      "author": "Environment Desk",
+      "publishedAt": "2025-11-03T12:00:00Z",
+      "imageKey": "news5.jpg",
+      "tags": ["world", "environment", "climate"]
+    },
+    {
+      "id": "news-6",
+      "title": "Electric Vehicle Market Booms in India",
+      "summary": "Sales of electric vehicles surge by 300% as government incentives drive adoption.",
+      "author": "Auto Desk",
+      "publishedAt": "2025-11-02T16:45:00Z",
+      "imageKey": "news6.jpg",
+      "tags": ["business", "technology", "automotive"]
+    },
+    {
+      "id": "news-7",
+      "title": "Cryptocurrency Regulations: What to Expect",
+      "summary": "Government announces comprehensive framework for digital currency regulation.",
+      "author": "Finance Desk",
+      "publishedAt": "2025-11-01T09:20:00Z",
+      "imageKey": "news7.jpg",
+      "tags": ["business", "technology", "finance"]
+    },
+    {
+      "id": "news-8",
+      "title": "Space Tourism: First Commercial Flight Success",
+      "summary": "Private space company achieves milestone with successful tourist mission to orbit.",
+      "author": "Science Desk",
+      "publishedAt": "2025-10-31T11:30:00Z",
+      "imageKey": "news8.jpg",
+      "tags": ["technology", "science", "space"]
+    },
+    {
+      "id": "news-9",
+      "title": "Olympic Games 2028: Host City Announced",
+      "summary": "International Olympic Committee selects Los Angeles as host for 2028 Summer Games.",
+      "author": "Sports Desk",
+      "publishedAt": "2025-10-30T14:15:00Z",
+      "imageKey": "news9.jpg",
+      "tags": ["sports", "olympics", "international"]
+    },
+    {
+      "id": "news-10",
+      "title": "AI Revolution in Healthcare: New Breakthroughs",
+      "summary": "Artificial intelligence transforms medical diagnosis and treatment planning.",
+      "author": "Health Desk",
+      "publishedAt": "2025-10-29T08:45:00Z",
+      "imageKey": "news10.jpg",
+      "tags": ["technology", "healthcare", "ai"]
+    },
+    {
+      "id": "news-11",
+      "title": "Renewable Energy Targets: India Leads Globally",
+      "summary": "Country achieves 50% renewable energy capacity ahead of schedule.",
+      "author": "Energy Desk",
+      "publishedAt": "2025-11-04T10:00:00Z",
+      "imageKey": "news11.jpg",
+      "tags": ["business", "environment", "energy"]
+    },
+    {
+      "id": "news-12",
+      "title": "Quantum Computing: Major Breakthrough Announced",
+      "summary": "Scientists achieve quantum supremacy milestone with new computing architecture.",
+      "author": "Tech Desk",
+      "publishedAt": "2025-11-03T15:30:00Z",
+      "imageKey": "news12.jpg",
+      "tags": ["technology", "science", "computing"]
+    }
+  ],
+  "sidebar": {
+    "latest": [
+      "Elections 2025: what to watch",
+      "Market roundup: Stocks to watch",
+      "Sports: Highlights of the week",
+      "Climate summit agreements",
+      "EV market surge in India",
+      "Crypto regulations announced"
+    ],
+    "categories": [
+      { "name": "Technology", "slug": "technology" },
+      { "name": "Business", "slug": "business" },
+      { "name": "Sports", "slug": "sports" },
+      { "name": "World", "slug": "world" },
+      { "name": "Science", "slug": "science" },
+      { "name": "Health", "slug": "health" },
+      { "name": "Environment", "slug": "environment" }
+    ]
+  }
+}

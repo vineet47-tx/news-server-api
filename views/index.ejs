@@ -1,154 +1,449 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News Portal</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        h1 {
-            color: green;
-        }
-        .sidebar-card { max-height: 220px; overflow: auto; }
-        .news-title { font-size: 0.95rem; font-weight: 600; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amar Ujala</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' fill='black'>AU</text></svg>">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    body { background-color: #f8f9fa; }
+    .featured-card, .news-card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+    .featured-card:hover, .news-card:hover { transform: translateY(-4px); }
+    .category-btn { border-radius: 20px; margin: 3px; transition: all 0.3s ease; }
+    .category-btn:hover { transform: scale(1.05); }
+    .section-title { color: #2c3e50; font-weight: 700; margin-bottom: 1.5rem; position: relative; }
+    .section-title::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 50px; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; }
+  </style>
 </head>
 
 <body>
-    <!-- Include Header File -->
-    <%- include('header') %>
+  <%- include('header') %>
 
-    <div class="container mt-4">
-        <div class="row">
-            <!-- Featured News Section -->
-            <div class="col-md-8">
-                <h2 class="mb-4">Featured News</h2>
-                <div class="card mb-4">
-                    <img src="https://placehold.co/600x400" class="card-img-top" alt="Featured News">
-                    <div class="card-body">
-                        <h3 class="card-title">Featured Story</h3>
-                        <p class="card-text">Main story content goes here...</p>
-                    </div>
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Featured News -->
+      <div class="col-md-8">
+        <h2 class="section-title">Featured News</h2>
+        <div id="featured-news">
+          <% if (items && items.length > 0) { %>
+            <div class="featured-card card mb-4">
+              <% var featuredItem = items[0]; %>
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <span class="badge bg-danger me-2">Featured</span>
+                  <% if (featuredItem.tags) { featuredItem.tags.forEach(t => { %>
+                    <span class="badge bg-secondary me-1"><%= t %></span>
+                  <% }); } %>
                 </div>
+                <h3 class="card-title text-primary mb-3"><%= featuredItem.title %></h3>
+                <p class="card-text text-muted mb-3"><%= featuredItem.summary || 'Read the full story...' %></p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">
+                    <i class="fas fa-user me-1"></i><%= featuredItem.author || 'Staff' %> |
+                    <i class="fas fa-calendar me-1"></i><%= new Date(featuredItem.publishedAt).toLocaleDateString() %>
+                  </small>
+                  <div class="mt-3">
+                    <small class="text-muted">
+                      <i class="fas fa-clock me-1"></i>Full article available
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="text-center text-muted py-5">No Featured News Available</div>
+          <% } %>
+        </div>
 
-                <!-- Image gallery pulled from S3 -->
-                <h4 class="mt-4">Image Gallery</h4>
-                <div class="row">
-                    <% if (items && items.length) { %>
-                        <% items.forEach(function(img) { 
-                            // normalize values: img may be a string or an object.
-                            var imageUrl = (img && img.url && img.url.url) ? img.url.url : (img && img.url) ? img.url : (typeof img === 'string' ? '' : '');
-                            var title = (img && img.title) ? img.title : (img && img.key) ? img.key : (typeof img === 'string' ? img : 'Untitled');
-                        %>
-                            <div class="col-6 col-md-4 col-lg-3 mb-3">
-                                <div class="card h-100">
-                                    <% if (imageUrl) { %>
-                                        <img src="<%= imageUrl %>" class="card-img-top" alt="<%= title %>">
-                                    <% } else { %>
-                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height:150px;">
-                                            <small class="text-muted">No preview</small>
-                                        </div>
-                                    <% } %>
-                                    <div class="card-body p-2">
-                                        <small class="text-muted"><%= title %></small>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }); %>
-                    <% } else { %>
-                        <div class="col-12">
-                            <p class="text-muted">No images available.</p>
-                        </div>
+        <!-- Latest Stories -->
+        <h4 class="section-title mt-5">Latest Stories</h4>
+        <div id="latest-stories" class="row">
+          <% if (items && items.length) {
+            items.slice(1).forEach(item => { %>
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+              <div class="news-card card h-100">
+                <div class="card-body d-flex flex-column">
+                  <div class="d-flex align-items-start mb-2">
+                    <% if (item.tags && item.tags.length) { %>
+                      <span class="badge bg-primary me-2"><%= item.tags[0] %></span>
                     <% } %>
+                    <small class="text-muted ms-auto"><i class="fas fa-clock"></i></small>
+                  </div>
+                  <h6 class="card-title text-primary mb-2"><%= item.title %></h6>
+                  <p class="card-text text-muted small flex-grow-1"><%= item.summary || 'Read the full story...' %></p>
+                  <div class="mt-auto">
+                    <small class="text-muted">
+                      <i class="fas fa-user me-1"></i><%= item.author || 'Staff' %> |
+                      <i class="fas fa-calendar me-1"></i><%= new Date(item.publishedAt).toLocaleDateString() %>
+                    </small>
+                  </div>
                 </div>
+              </div>
             </div>
+          <% }); } %>
+        </div>
+      </div>
 
-            <!-- Sidebar -->
-            <div class="col-md-4">
-                <div class="mb-4">
-                    <h5 class="mb-3">Latest</h5>
-                    <div class="list-group sidebar-card">
-                        <% if (sidebar && sidebar.latest && sidebar.latest.length) { %>
-                            <% sidebar.latest.forEach(function(item) { %>
-                                <a href="#" class="list-group-item list-group-item-action small"><%= item %></a>
-                            <% }); %>
-                        <% } else { %>
-                            <div class="p-2 text-muted small">No latest items.</div>
-                        <% } %>
-                    </div>
-                </div>
+      <!-- Sidebar -->
+      <div class="col-md-4">
 
-                <div class="mb-4">
-                    <h5 class="mb-3">Categories</h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        <% if (sidebar && sidebar.categories && sidebar.categories.length) { %>
-                            <% sidebar.categories.forEach(function(cat) { %>
-                                <a href="/category/<%= cat.slug %>" class="btn btn-outline-secondary btn-sm"><%= cat.name %></a>
-                            <% }); %>
-                        <% } else { %>
-                            <small class="text-muted">No categories.</small>
-                        <% } %>
+        <!-- Latest Headlines -->
+        <div class="mb-4">
+          <h5 class="section-title mb-3">Latest Headlines</h5>
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+              <% if (sidebar && sidebar.latest && sidebar.latest.length) { %>
+                <div class="list-group list-group-flush">
+                  <% sidebar.latest.forEach((item, index) => { %>
+                    <div class="list-group-item border-0 px-3 py-3 d-flex align-items-center">
+                      <div class="flex-shrink-0 me-3">
+                        <span class="badge bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                          <%= index + 1 %>
+                        </span>
+                      </div>
+                      <div class="flex-grow-1">
+                        <small class="fw-semibold text-dark"><%= item %></small>
+                      </div>
                     </div>
+                  <% }); %>
                 </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Subscribe</h6>
-                        <p class="card-text small text-muted">Get the latest headlines delivered to your inbox.</p>
-                        <form>
-                            <div class="mb-2">
-                                <input type="email" class="form-control form-control-sm" placeholder="Email address">
-                            </div>
-                            <button type="button" class="btn btn-primary btn-sm">Subscribe</button>
-                        </form>
-                    </div>
+              <% } else { %>
+                <div class="p-4 text-center text-muted">
+                  <i class="fas fa-clock fa-2x mb-2"></i>
+                  <p class="mb-0 small">No latest headlines available.</p>
                 </div>
+              <% } %>
             </div>
+          </div>
         </div>
 
-        <!-- Additional sections (optional) -->
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h5>Top Stories</h5>
-                <div class="row">
-                    <!-- Example cards -->
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <img src="https://placehold.co/400x200" class="card-img-top" alt="story">
-                            <div class="card-body">
-                                <p class="news-title">Analysis: Market movements this week</p>
-                                <p class="small text-muted">By Staff | 2 hrs ago</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <img src="https://placehold.co/400x200" class="card-img-top" alt="story">
-                            <div class="card-body">
-                                <p class="news-title">Tech: New device launches</p>
-                                <p class="small text-muted">By Tech Desk | 4 hrs ago</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <img src="https://placehold.co/400x200" class="card-img-top" alt="story">
-                            <div class="card-body">
-                                <p class="news-title">Sports: Weekly roundup</p>
-                                <p class="small text-muted">By Sports | 6 hrs ago</p>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Newsletter Subscription -->
+        <div class="mb-4">
+          <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="card-body text-center">
+              <i class="fas fa-envelope fa-2x mb-3"></i>
+              <h6 class="card-title mb-3">Stay Updated</h6>
+              <p class="card-text small opacity-75 mb-4">Get the latest headlines delivered to your inbox daily.</p>
+              <form id="subscribeForm">
+                <div class="mb-3">
+                  <input type="email" class="form-control form-control-sm bg-white border-0" placeholder="Enter your email" required>
                 </div>
+                <button type="submit" class="btn btn-light btn-sm w-100 fw-semibold">
+                  <i class="fas fa-paper-plane me-1"></i>Subscribe Now
+                </button>
+              </form>
+              <small class="opacity-75 mt-3 d-block">No spam, unsubscribe anytime.</small>
             </div>
+          </div>
         </div>
+
+        <!-- Popular Tags -->
+        <div class="mb-4">
+          <h5 class="section-title mb-3">Popular Tags</h5>
+          <div class="d-flex flex-wrap gap-2">
+            <% const popularTags = ['technology', 'business', 'sports', 'world', 'science', 'health']; %>
+            <% popularTags.forEach(tag => { %>
+              <span class="badge bg-light text-dark px-3 py-2 border">
+                <i class="fas fa-hashtag me-1 text-muted"></i><%= tag %>
+              </span>
+            <% }); %>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    let allNewsItems = [];
+
+    // On page load
+    document.addEventListener('DOMContentLoaded', function() {
+  allNewsItems = JSON.parse('<%- JSON.stringify(items).replace(/</g, "\\u003c") %>');
+
+  // ✅ Extract unique tags from all news items
+  const uniqueTags = [...new Set(allNewsItems.flatMap(item => item.tags || []))];
+
+  // ✅ Create category buttons in a new location or remove if not needed
+  // Categories section removed as requested
+});
+
+
+    // ✅ Update Featured News dynamically
+    function updateFeaturedNews(items) {
+      const featuredContainer = document.getElementById('featured-news');
+      featuredContainer.innerHTML = '';
+
+      if (!items.length) {
+        featuredContainer.innerHTML = `
+          <div class="text-center text-muted py-5">
+            <i class="fas fa-newspaper fa-3x mb-3"></i>
+            <h5>No Featured News Available</h5>
+          </div>`;
+        return;
+      }
+
+      const f = items[0];
+      const tags = f.tags?.map(t => `<span class="badge bg-secondary me-1">${t}</span>`).join('') || '';
+
+      featuredContainer.innerHTML = `
+        <div class="featured-card card mb-4">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <span class="badge bg-danger me-2">Featured</span>${tags}
+            </div>
+            <h3 class="card-title text-primary mb-3">${f.title}</h3>
+            <p class="card-text text-muted mb-3">${f.summary || 'Read the full story...'}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                <i class="fas fa-user me-1"></i>${f.author || 'Staff'} |
+                <i class="fas fa-calendar me-1"></i>${new Date(f.publishedAt).toLocaleDateString()}
+              </small>
+              <button onclick="showArticleModal('${f.id}')" class="btn btn-primary btn-sm">
+                <i class="fas fa-arrow-right me-1"></i>Read More
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ✅ Update Latest Stories dynamically
+    function updateLatestStories(items) {
+      const container = document.getElementById('latest-stories');
+      container.innerHTML = '';
+
+      const stories = items.slice(1);
+      if (!stories.length) {
+        container.innerHTML = `
+          <div class="col-12 text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No articles found in this category.</p>
+          </div>`;
+        return;
+      }
+
+      stories.forEach(item => {
+        const tags = item.tags && item.tags.length ? `<span class="badge bg-primary me-2">${item.tags[0]}</span>` : '';
+        const title = item.title || 'Untitled';
+        const summary = item.summary ? item.summary.substring(0,120) : '';
+        const author = item.author || 'Staff';
+        const publishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : 'Recent';
+
+        container.innerHTML += `
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="news-card card h-100">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex align-items-start mb-2">
+                  ${tags}<small class="text-muted ms-auto"><i class="fas fa-clock"></i></small>
+                </div>
+                <h6 class="card-title text-primary mb-2">${title}</h6>
+                <p class="card-text text-muted small flex-grow-1">${summary}</p>
+                <div class="d-flex justify-content-between align-items-center mt-auto">
+                  <small class="text-muted">
+                    <i class="fas fa-user me-1"></i>${author} |
+                    <i class="fas fa-calendar me-1"></i>${publishedAt}
+                  </small>
+                  <button onclick="showArticleModal('${item.id}')" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-arrow-right me-1"></i>Read
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      });
+    }
+
+    // ✅ Highlight active category
+    function updateActiveCategory(slug) {
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        if (btn.dataset.category.toLowerCase() === slug.toLowerCase()) {
+          btn.classList.add('active');
+          btn.classList.remove('btn-outline-primary');
+          btn.classList.add('btn-primary');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.remove('btn-primary');
+          btn.classList.add('btn-outline-primary');
+        }
+      });
+    }
+
+    // ✅ Filter by category
+    function filterByCategory(categorySlug) {
+      // Update active button states
+      updateActiveCategory(categorySlug);
+
+      // Filter news items client-side
+      let filteredItems = allNewsItems;
+
+      if (categorySlug !== 'all') {
+        filteredItems = allNewsItems.filter(item =>
+          item.tags && item.tags.some(tag => tag.toLowerCase().includes(categorySlug.toLowerCase()))
+        );
+      }
+
+      // Update the Featured News and Latest Stories sections
+      updateFeaturedNews(filteredItems);
+      updateLatestStories(filteredItems);
+
+      // Update URL for bookmarking (optional)
+      const url = new URL(window.location);
+      if (categorySlug === 'all') {
+        url.searchParams.delete('category');
+      } else {
+        url.searchParams.set('category', categorySlug);
+      }
+      window.history.pushState({}, '', url.toString());
+    }
+
+    // ✅ Show article in modal with all remaining news
+    function showArticleModal(articleId) {
+      const currentArticle = allNewsItems.find(item => item.id === articleId);
+      if (!currentArticle) return;
+
+      // Get all other news items (excluding current one)
+      const otherNews = allNewsItems.filter(item => item.id !== articleId);
+
+      const modalHtml = `
+        <div class="modal fade" id="articleModal" tabindex="-1" aria-labelledby="articleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="articleModalLabel">${currentArticle.title}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <!-- Main Article Content -->
+                  <div class="col-lg-8">
+                    <div class="mb-3">
+                      ${currentArticle.tags ? currentArticle.tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('') : ''}
+                    </div>
+                    <div class="mb-3">
+                      <small class="text-muted">
+                        <i class="fas fa-user me-1"></i>${currentArticle.author || 'Staff'} |
+                        <i class="fas fa-calendar me-1"></i>${new Date(currentArticle.publishedAt).toLocaleDateString()}
+                      </small>
+                    </div>
+                    <div class="article-content">
+                      <p class="lead">${currentArticle.summary}</p>
+                      <div class="mt-4">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        <h5>Key Points</h5>
+                        <ul>
+                          <li>Important point number one</li>
+                          <li>Another crucial aspect</li>
+                          <li>Final key consideration</li>
+                        </ul>
+                        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sidebar with Other News -->
+                  <div class="col-lg-4">
+                    <h6 class="mb-3 text-primary">
+                      <i class="fas fa-newspaper me-2"></i>More Stories
+                    </h6>
+                    <div class="other-news-list" style="max-height: 500px; overflow-y: auto;">
+                      ${otherNews.map((news, index) => `
+                        <div class="card mb-3 border-0 shadow-sm" style="cursor: pointer;" onclick="switchToArticle('${news.id}')">
+                          <div class="card-body p-3">
+                            <div class="d-flex align-items-start">
+                              <div class="flex-shrink-0 me-2">
+                                <span class="badge bg-primary rounded-circle" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;">
+                                  ${index + 1}
+                                </span>
+                              </div>
+                              <div class="flex-grow-1">
+                                <h6 class="card-title mb-1" style="font-size: 0.9rem; line-height: 1.3;">${news.title}</h6>
+                                <p class="card-text small text-muted mb-1" style="font-size: 0.8rem;">
+                                  ${news.summary ? news.summary.substring(0, 80) + '...' : 'Read more...'}
+                                </p>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                  <i class="fas fa-user me-1"></i>${news.author || 'Staff'}
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" onclick="shareArticle('${currentArticle.id}')">
+                  <i class="fas fa-share me-1"></i>Share
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="bookmarkArticle('${currentArticle.id}')">
+                  <i class="fas fa-bookmark me-1"></i>Bookmark
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Remove existing modal if any
+      const existingModal = document.getElementById('articleModal');
+      if (existingModal) {
+        existingModal.remove();
+      }
+
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Show modal
+      const modal = new bootstrap.Modal(document.getElementById('articleModal'));
+      modal.show();
+    }
+
+    // ✅ Switch to different article in modal
+    function switchToArticle(articleId) {
+      // Close current modal
+      const currentModal = bootstrap.Modal.getInstance(document.getElementById('articleModal'));
+      if (currentModal) {
+        currentModal.hide();
+      }
+
+      // Small delay to allow modal to close, then open new one
+      setTimeout(() => {
+        showArticleModal(articleId);
+      }, 300);
+    }
+
+    // ✅ Share article function
+    function shareArticle(articleId) {
+      const article = allNewsItems.find(item => item.id === articleId);
+      if (article) {
+        const url = window.location.href;
+        navigator.share({
+          title: article.title,
+          text: article.summary,
+          url: url
+        }).catch(() => {
+          // Fallback for browsers that don't support Web Share API
+          navigator.clipboard.writeText(url).then(() => {
+            alert('Article link copied to clipboard!');
+          });
+        });
+      }
+    }
+
+    // ✅ Bookmark article function
+    function bookmarkArticle(articleId) {
+      alert('Article bookmarked! (This would save to user preferences in a real app)');
+    }
+  </script>
 </body>
-
 </html>
