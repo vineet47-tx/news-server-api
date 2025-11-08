@@ -33,6 +33,9 @@
           <% if (items && items.length > 0) { %>
             <div class="featured-card card mb-4">
               <% var featuredItem = items[0]; %>
+              <% if (featuredItem.imageUrl) { %>
+                <img src="<%= featuredItem.imageUrl %>" class="card-img-top" alt="<%= featuredItem.title %>" style="height: 200px; object-fit: cover;">
+              <% } %>
               <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                   <span class="badge bg-danger me-2">Featured</span>
@@ -67,6 +70,9 @@
             items.slice(1).forEach(item => { %>
             <div class="col-12 col-md-6 col-lg-4 mb-4">
               <div class="news-card card h-100">
+                <% if (item.imageUrl) { %>
+                  <img src="<%= item.imageUrl %>" class="card-img-top" alt="<%= item.title %>" style="height: 150px; object-fit: cover;">
+                <% } %>
                 <div class="card-body d-flex flex-column">
                   <div class="d-flex align-items-start mb-2">
                     <% if (item.tags && item.tags.length) { %>
@@ -192,9 +198,11 @@
 
       const f = items[0];
       const tags = f.tags?.map(t => `<span class="badge bg-secondary me-1">${t}</span>`).join('') || '';
+      const imageHtml = f.imageUrl ? `<img src="${f.imageUrl}" class="card-img-top" alt="${f.title}" style="height: 200px; object-fit: cover;">` : '';
 
       featuredContainer.innerHTML = `
         <div class="featured-card card mb-4">
+          ${imageHtml}
           <div class="card-body">
             <div class="d-flex align-items-center mb-3">
               <span class="badge bg-danger me-2">Featured</span>${tags}
@@ -235,10 +243,12 @@
         const summary = item.summary ? item.summary.substring(0,120) : '';
         const author = item.author || 'Staff';
         const publishedAt = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : 'Recent';
+        const imageHtml = item.imageUrl ? `<img src="${item.imageUrl}" class="card-img-top" alt="${title}" style="height: 150px; object-fit: cover;">` : '';
 
         container.innerHTML += `
           <div class="col-12 col-md-6 col-lg-4 mb-4">
             <div class="news-card card h-100">
+              ${imageHtml}
               <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-start mb-2">
                   ${tags}<small class="text-muted ms-auto"><i class="fas fa-clock"></i></small>
