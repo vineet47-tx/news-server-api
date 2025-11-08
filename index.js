@@ -7,9 +7,13 @@ const path = require('path');
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
-// AWS SDK v3 DynamoDB client
+
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { ScanCommand } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+
+// Initialize DynamoDB Document client (uses same region/env chain)
+const ddbClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-south-1' });
+const docClient = DynamoDBDocumentClient.from(ddbClient);
 
 
 // Create an Express application
@@ -17,10 +21,6 @@ const app = express();
 
 // Define the port for the server to listen on
 const port = 3000;
-
-// Middleware for parsing form data
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
@@ -40,9 +40,6 @@ app.set('views', path.join(__dirname, 'views'));
 */
 const s3Client = new S3Client({ region: process.env.AWS_REGION || 'ap-south-1' });
 
-// Initialize DynamoDB client
-const dynamoClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-south-1' });
-
 /*
  Helper to convert response Body (a stream) to string
 */
@@ -55,35 +52,50 @@ async function streamToString(stream) {
     });
 }
 
+function normalizeValue(val) {
+    if (val === null || val === undefined) return val;
+    if (typeof val !== 'object') return val;
 
-// Fetch news items from DynamoDB
+    // DynamoDB low-level attribute value shapes
+    if ('S' in val) return val.S;
+    if ('N' in val) return Number(val.N);
+    if ('BOOL' in val) return val.BOOL;
+    if ('L' in val) return (val.L || []).map(normalizeValue);
+    if ('M' in val) {
+        const out = {};
+        for (const k of Object.keys(val.M || {})) out[k] = normalizeValue(val.M[k]);
+        return out;
+    }
+
+    // If already a plain object (DocumentClient), normalize its fields
+    const out = {};
+    for (const k of Object.keys(val)) out[k] = normalizeValue(val[k]);
+    return out;
+}
+
+// new: fetch news items from DynamoDB (expects items with a `title` or `heading` attribute)
 async function fetchNewsFromDDB() {
-    const tableName = process.env.NEWS_TABLE_NAME || 'news-portal-table';
+    const TableName = process.env.NEWS_TABLE || 'News';
     try {
-        const command = new ScanCommand({
-            TableName: tableName,
-            FilterExpression: 'begins_with(#id, :newsPrefix)',
-            ExpressionAttributeNames: {
-                '#id': 'id'
-            },
-            ExpressionAttributeValues: {
-                ':newsPrefix': { S: 'news-' }
-            }
-        });
+        const cmd = new ScanCommand({ TableName, Limit: 100 });
+        const resp = await docClient.send(cmd);
+        const rawItems = resp.Items || [];
 
-        const response = await dynamoClient.send(command);
-        const items = response.Items || [];
+        // normalize low-level AttributeValue shapes or DocumentClient shapes
+        const items = rawItems.map(it => normalizeValue(it));
 
-        // Transform DynamoDB items to the expected format
-        return items.map(item => ({
-            id: item.id.S,
-            title: item.title.S,
-            summary: item.summary.S,
-            author: item.author.S,
-            publishedAt: item.publishedAt.S,
-            imageKey: item.imageKey.S,
-            tags: item.tags.L ? item.tags.L.map(tag => tag.S) : []
+        // map to a consistent shape the app expects
+        const mapped = items.map(i => ({
+            id: i.id || i.ID || null,
+            title: i.title || i.heading || i.name || '',
+            summary: i.summary || '',
+            author: i.author || '',
+            publishedAt: i.publishedAt || '',
+            imageKey: i.imageKey || i.image || null,
+            tags: Array.isArray(i.tags) ? i.tags : (i.tags ? [i.tags] : [])
         }));
+
+        return mapped;
     } catch (err) {
         console.error('Error fetching news from DynamoDB:', err);
         throw err;
@@ -91,44 +103,38 @@ async function fetchNewsFromDDB() {
 }
 
 
-// Fetch sidebar data from DynamoDB
+// new: fetch sidebar data from DynamoDB
+// supports two schemas:
+// 1) each item has type: 'latest' or 'category' with appropriate fields
+// 2) single config item with latest[] and categories[] attributes
 async function fetchSidebarFromDDB() {
-    const tableName = process.env.NEWS_TABLE_NAME || 'news-portal-table';
+    const TableName = process.env.SIDEBAR_TABLE || 'Sidebar';
     try {
-        // Fetch latest items
-        const latestCommand = new ScanCommand({
-            TableName: tableName,
-            FilterExpression: '#type = :latestType',
-            ExpressionAttributeNames: {
-                '#type': 'type'
-            },
-            ExpressionAttributeValues: {
-                ':latestType': { S: 'latest' }
-            }
-        });
+        const cmd = new ScanCommand({ TableName, Limit: 100 });
+        const resp = await docClient.send(cmd);
+        const rawItems = resp.Items || [];
 
-        const latestResponse = await dynamoClient.send(latestCommand);
-        const latestItems = latestResponse.Items || [];
-        const latest = latestItems.map(item => item.title.S);
+        // normalize all items to plain JS objects
+        const items = rawItems.map(it => normalizeValue(it));
 
-        // Fetch categories
-        const categoryCommand = new ScanCommand({
-            TableName: tableName,
-            FilterExpression: '#type = :categoryType',
-            ExpressionAttributeNames: {
-                '#type': 'type'
-            },
-            ExpressionAttributeValues: {
-                ':categoryType': { S: 'category' }
-            }
-        });
+        // support single-config item with arrays: { latest: [...], categories: [...] }
+        if (items[0] && (Array.isArray(items[0].latest) || Array.isArray(items[0].categories))) {
+            return {
+                latest: items[0].latest || [],
+                categories: items[0].categories || []
+            };
+        }
 
-        const categoryResponse = await dynamoClient.send(categoryCommand);
-        const categoryItems = categoryResponse.Items || [];
-        const categories = categoryItems.map(item => ({
-            name: item.name.S,
-            slug: item.slug.S
-        }));
+        // per-row style: type === 'latest' or type === 'category'
+        const latest = items
+            .filter(i => (i.type === 'latest'))
+            .map(i => i.title || i.name)
+            .filter(Boolean);
+
+        const categories = items
+            .filter(i => (i.type === 'category'))
+            .map(i => ({ name: i.name, slug: i.slug || (i.name || '').toLowerCase().replace(/\s+/g, '-') }))
+            .filter(Boolean);
 
         return { latest, categories };
     } catch (err) {
@@ -157,9 +163,6 @@ async function fetchImageUrlByKey(key) {
         return { key: Key, url };
     } catch (err) {
         console.error(`Error fetching S3 object for key=${Key}:`, err);
-        console.error('Error code:', err.code);
-        console.error('Error message:', err.message);
-        console.error('Error stack:', err.stack);
         throw err;
     }
 }
@@ -169,86 +172,37 @@ async function fetchImageUrlByKey(key) {
  template when the root path is accessed
  */
 app.get('/', async (req, res) => {
+    // Default news items (kept as fallback)
+    let newsItems = await fetchNewsFromDDB();
+
+    let items = newsItems; // fallback
+
+    let keys = [
+        'news1.jpg',
+        'news2.jpg',
+        'news3.jpg',
+        'news4.jpg'
+    ]
+
+    sidebar = await fetchSidebarFromDDB();
+    console.log('Fetched sidebar data:', sidebar);
+    
     try {
-        // Fetch news items and sidebar data
-        let newsItems = await fetchNewsFromDDB();
-        const sidebar = await fetchSidebarFromDDB();
-
-        // Handle search query
-        const searchQuery = req.query.search;
-        if (searchQuery && searchQuery.trim()) {
-            const query = searchQuery.toLowerCase().trim();
-            newsItems = newsItems.filter(item =>
-                item.title.toLowerCase().includes(query) ||
-                item.summary.toLowerCase().includes(query) ||
-                item.author.toLowerCase().includes(query) ||
-                (item.tags && item.tags.some(tag => tag.toLowerCase().includes(query)))
-            );
-        }
-
-        // Handle category filter
-        const categoryFilter = req.query.category;
-        if (categoryFilter && categoryFilter.trim()) {
-            const category = categoryFilter.toLowerCase().trim();
-            newsItems = newsItems.filter(item =>
-                item.tags && item.tags.some(tag => tag.toLowerCase().includes(category))
-            );
-        }
-
-        console.log('Fetched news items:', newsItems.length);
-        console.log('Fetched sidebar data:', sidebar);
-
-        // Render index.ejs with news items and sidebar
-        res.render('index', {
-            name: 'Amar Ujala',
-            items: newsItems,
-            sidebar,
-            searchQuery: searchQuery || '',
-            categoryFilter: categoryFilter || ''
-        });
+            const fetched = await Promise.all(keys.map(k => fetchImageUrlByKey(k)));
+            // store fetched objects in items as { key, url }
+            items = newsItems.map((x, i) => {
+                return {
+                    title: x.title,
+                    url: fetched[i]
+                }
+            })
+        console.log('Prepared items for rendering items:', items);
+        // Render index.ejs with items (either news strings or fetched s3 objects)
+        res.render('index', { name: 'ABC News', items, sidebar });
     } catch (err) {
-        console.error('Error in route handler:', err);
+        console.error('Error while preparing items:', err);
         // on error render page with empty items
-        res.render('index', { name: 'Amar Ujala', items: [], sidebar: { latest: [], categories: [] }, searchQuery: '', categoryFilter: '' });
-    }
-});
-
-// Handle search form submission
-app.post('/search', (req, res) => {
-    const searchQuery = req.body.search;
-    res.redirect(`/?search=${encodeURIComponent(searchQuery || '')}`);
-});
-
-// Handle category filtering - redirect to home with category filter
-app.get('/category/:slug', async (req, res) => {
-    try {
-        const categorySlug = req.params.slug;
-        res.redirect(`/?category=${encodeURIComponent(categorySlug)}`);
-    } catch (err) {
-        console.error('Error in category route:', err);
-        res.redirect('/');
-    }
-});
-
-// Handle article detail (placeholder)
-app.get('/article/:id', async (req, res) => {
-    try {
-        const articleId = req.params.id;
-        const newsItems = await fetchNewsFromDDB();
-        const article = newsItems.find(item => item.id === articleId);
-
-        if (article) {
-            res.render('article', {
-                name: 'Amar Ujala',
-                article,
-                sidebar: await fetchSidebarFromDDB()
-            });
-        } else {
-            res.status(404).render('404', { name: 'Amar Ujala' });
-        }
-    } catch (err) {
-        console.error('Error in article route:', err);
-        res.status(500).send('Internal Server Error');
+        res.render('index', { name: 'ABC News', items: [] });
     }
 });
 // Start the server and listen on the specified port
