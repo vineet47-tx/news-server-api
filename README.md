@@ -117,3 +117,12 @@ docker rm my-express-container
 - `GET /`: Home page with news list and search
 - `POST /search`: Handle search form submission
 - `GET /article/:id`: View specific article
+
+
+
+
+## Container
+
+- create cluster
+- create task
+- run task in cluster

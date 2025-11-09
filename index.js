@@ -158,6 +158,7 @@ async function fetchImageUrlByKey(key) {
 app.get('/', async (req, res) => {
   try {
     let newsItems = await fetchNewsFromDDB();
+    console.log(`Fetched ${newsItems.length} news items from DDB`);
     const sidebar = await fetchSidebarFromDDB();
 
     // Search filter
@@ -213,6 +214,11 @@ app.get('/category/:slug', (req, res) => {
   res.redirect(`/?category=${encodeURIComponent(categorySlug)}`);
 });
 
+/* Category filter redirect */
+app.get('/health', (req, res) => {
+  res.send('OK');
+});
+
 /* Article detail page */
 app.get('/article/:id', async (req, res) => {
   try {
@@ -235,6 +241,6 @@ app.get('/article/:id', async (req, res) => {
 });
 
 /* Start server */
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
