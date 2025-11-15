@@ -184,7 +184,7 @@ app.get('/', async (req, res) => {
     }
 
     res.render('index', {
-      name: 'Amar Ujala',
+      name: 'The Prime News',
       items: newsItems,
       sidebar,
       searchQuery: searchQuery || '',
@@ -193,7 +193,7 @@ app.get('/', async (req, res) => {
   } catch (err) {
     console.error('Error in route handler:', err);
     res.render('index', {
-      name: 'Amar Ujala',
+      name: 'The Prime News',
       items: [],
       sidebar: { latest: [], categories: [] },
       searchQuery: '',
@@ -227,12 +227,12 @@ app.get('/article/:id', async (req, res) => {
     const article = newsItems.find(item => item.id === articleId);
     if (article) {
       res.render('article', {
-        name: 'Amar Ujala',
+        name: 'The Prime News',
         article,
         sidebar: await fetchSidebarFromDDB()
       });
     } else {
-      res.status(404).render('404', { name: 'Amar Ujala' });
+      res.status(404).render('404', { name: 'The Prime News' });
     }
   } catch (err) {
     console.error('Error in article route:', err);

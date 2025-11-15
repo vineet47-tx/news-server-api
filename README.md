@@ -126,3 +126,9 @@ docker rm my-express-container
 - create cluster
 - create task
 - run task in cluster
+
+## OS Architechture
+Linux/ARM64
+
+## Health Check Command
+CMD-SHELL, curl -f http://localhost:3000/health || exit 1
